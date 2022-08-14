@@ -2,7 +2,7 @@ use image::{RgbImage, Rgb};
 use vector::Vec3;
 
 mod vector;
-
+mod ray;
 
 fn main() {
     let (w, h) = (256, 256);
