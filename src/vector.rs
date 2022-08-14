@@ -22,6 +22,10 @@ macro_rules! v {
     ($x:expr) => {
         Vec3::new(f64::from($x), f64::from($x), f64::from($x))
     };
+    
+    () => {
+        Vec3::new(0.0, 0.0, 0.0)
+    };
 }
 
 // Converts [0.0, 1.0] to [0, 255]

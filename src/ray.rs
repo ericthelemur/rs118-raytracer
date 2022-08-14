@@ -1,17 +1,21 @@
 use crate::vector::{Vec3, Point};
 
 #[derive(Debug, Copy, Clone)]
-struct Ray {
+pub struct Ray {
     origin: Point,
     dir: Vec3
 }
 
 impl Ray {
-    fn new(origin: Point, dir: Vec3) -> Self { 
+    pub fn new(origin: Point, dir: Vec3) -> Self { 
         Self { origin: origin, dir: dir.norm() } 
     }
 
-    fn at(&self, t: f64) -> Point {
+    pub fn between(origin: Point, target: Point) -> Self {
+        Self::new(origin, target - origin)
+    }
+
+    pub fn at(&self, t: f64) -> Point {
         self.origin + (self.dir * t)
     }
 }
