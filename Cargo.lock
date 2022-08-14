@@ -491,6 +491,7 @@ dependencies = [
  "derive_more",
  "image",
  "lerp",
+ "rayon",
 ]
 
 [[package]]

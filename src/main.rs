@@ -42,12 +42,13 @@ fn main() {
     let v = Viewport { w: vh * aspect_ratio, h: vh, f: 1.0 };
 
     let mut img = RgbImage::new(w, h);
-    for (x, y, p) in img.enumerate_pixels_mut() {
+
+    img.enumerate_pixels_mut().par_bridge().for_each(|(x, y, p)| {
         let vxy = v!(x, y, 0).rescale(v!(), v!(w, h, 0), v.tl(), v.br());
         let ray = Ray::towards(v!(), vxy);
         let colour = colour(&ray);
         *p = colour.into()
-    }
+    });
 
     img.save("test.png").expect("Eror writing image");
 }
