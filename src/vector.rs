@@ -1,10 +1,10 @@
 use std::ops;
 
-use derive_more::{Add, Sub, Mul, Div, Neg};
+use derive_more::{Constructor, Add, Sub, Mul, Div, Neg};
 use image::Rgb;
 
 
-#[derive(Debug, Copy, Clone, Add, Sub, Mul, Div, Neg, PartialEq, PartialOrd)]
+#[derive(Debug, Copy, Clone, Constructor, Add, Sub, Mul, Div, Neg, PartialEq, PartialOrd)]
 pub struct Vec3 {
     x: f64,
     y: f64,
@@ -20,9 +20,17 @@ pub fn f2b(v: f64) -> u8 {
 }
 
 // Converts Vec3 to image::Rgb
-impl From<&Vec3> for Rgb<u8> {
-    fn from(v: &Vec3) -> Self {
-        Self(v.map(f2b))
+impl From<Vec3> for Rgb<u8> {
+    fn from(v: Vec3) -> Self {
+        let arr: [f64; 3] = v.into();
+        Self(arr.map(f2b))
+    }
+}
+
+// Converts Vec3 to [f, f, f]
+impl From<Vec3> for [f64; 3] {
+    fn from(v: Vec3) -> Self {
+        [v.x, v.y, v.z]
     }
 }
 
@@ -50,7 +58,7 @@ impl Vec3 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
-    pub fn len(&self) -> f64 {
+    pub fn mag(&self) -> f64 {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
     }
 
@@ -62,11 +70,12 @@ impl Vec3 {
         }
     }
 
-    pub fn mapv<F: FnMut(f64) -> f64>(self, mut f: F) -> Vec3 {
+    pub fn map<F: FnMut(f64) -> f64>(self, mut f: F) -> Vec3 {
         Vec3 { x: f(self.x), y: f(self.y), z: f(self.z) }
     }
 
-    pub fn map<F: FnMut(f64) -> U, U>(self, mut f: F) -> [U; 3] {
-        [f(self.x), f(self.y), f(self.z)]
+    pub fn norm(&self) -> Vec3 {
+        let mag = self.mag();
+        self.map(|v| v / mag)
     }
 }
