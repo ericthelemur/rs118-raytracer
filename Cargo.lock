@@ -292,6 +292,27 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7efd1d698db0759e6ef11a7cd44407407399a910c774dd804c64c032da7826ff"
 
 [[package]]
+name = "lerp"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b19ac50d419bff1a024a8eb8034bfbee6c1cf8fa3472502f6bd3def327b09e4c"
+dependencies = [
+ "lerp_derive",
+ "num-traits",
+]
+
+[[package]]
+name = "lerp_derive"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "36cd57b70ff225446222bf104d80f6d43d2bdca0f2f31171d6cf17148bce0171"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "libc"
 version = "0.2.131"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -469,6 +490,7 @@ version = "0.1.0"
 dependencies = [
  "derive_more",
  "image",
+ "lerp",
 ]
 
 [[package]]

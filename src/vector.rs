@@ -2,13 +2,14 @@ use std::ops;
 
 use derive_more::{Constructor, Add, Sub, Mul, Div, Neg};
 use image::Rgb;
+use lerp::Lerp;
 
 
 #[derive(Debug, Copy, Clone, Constructor, Add, Sub, Mul, Div, Neg, PartialEq, PartialOrd)]
 pub struct Vec3 {
-    x: f64,
-    y: f64,
-    z: f64
+    pub x: f64,
+    pub y: f64,
+    pub z: f64
 }
 
 pub type Colour = Vec3;
@@ -66,6 +67,15 @@ impl ops::Mul<Vec3> for Vec3 {
     }
 }
 
+// vec / vec element-wise
+impl ops::Div<Vec3> for Vec3 {
+    type Output = Vec3;
+
+    fn div(self, other: Vec3) -> Self::Output {
+        Vec3{ x: self.x / other.x, y: self.y / other.y, z: self.z / other.z }
+    }
+}
+
 
 impl Vec3 {
     pub fn dot(&self, other: Self) -> f64 {
@@ -76,20 +86,43 @@ impl Vec3 {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
     }
 
-    pub fn cross(&self, other: Self) -> Vec3 {
-        Vec3 {
+    pub fn cross(&self, other: Self) -> Self {
+        Self {
             x: self.y * other.z - self.z * other.y,
             y: self.z * other.x - self.x * other.z,
             z: self.x * other.y - self.y * other.x,
         }
     }
 
-    pub fn map<F: FnMut(f64) -> f64>(self, mut f: F) -> Vec3 {
-        Vec3 { x: f(self.x), y: f(self.y), z: f(self.z) }
+    pub fn map<F: FnMut(f64) -> f64>(self, mut f: F) -> Self {
+        Self { x: f(self.x), y: f(self.y), z: f(self.z) }
     }
 
-    pub fn norm(&self) -> Vec3 {
+    pub fn norm(&self) -> Self {
         let mag = self.mag();
         self.map(|v| v / mag)
+    }
+
+    fn invlerp(&self, low: Self, high: Self) -> Self {
+        let mut r = (*self - low) / (high - low);
+        if high.x == low.x { r.x = 0.5 }
+        if high.y == low.y { r.y = 0.5 }
+        if high.z == low.z { r.z = 0.5 }
+        r
+    }
+
+    pub fn rescale(&self, oldmin: Self, oldmax: Self, newmin: Self, newmax: Self) -> Self {
+        let v = self.invlerp(oldmin, oldmax);
+        newmin.lerp(newmax, v)
+    }
+}
+
+impl Lerp<Vec3> for Vec3 {
+    fn lerp(self, other: Self, t: Vec3) -> Self {
+        Self {
+            x: self.x.lerp(other.x, t.x),
+            y: self.y.lerp(other.y, t.y),
+            z: self.z.lerp(other.z, t.z),
+        }
     }
 }
