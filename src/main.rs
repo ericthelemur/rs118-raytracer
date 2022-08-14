@@ -1,6 +1,6 @@
 mod vector;
 mod ray;
-mod util;
+mod object;
 
 use image::{RgbImage};
 use lerp::Lerp;
@@ -25,6 +25,10 @@ impl Viewport {
 }
 
 fn colour(ray: &Ray) -> Colour {
+    let sphere = object::Sphere::new(v!(0, 0, -1), 0.5);
+    if sphere.hit(ray) {
+        return v!(1.0, 0, 0);
+    }
     v!(1).lerp(v!(0.5, 0.7, 1.0), (ray.dir.norm().y+1.0)/2.0)
 }
 
