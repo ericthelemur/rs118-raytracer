@@ -16,6 +16,6 @@ impl Ray {
     }
 
     pub fn at(&self, t: f64) -> Point {
-        self.origin + (self.dir * t)
+        self.origin + (self.dir.norm() * t)
     }
 }

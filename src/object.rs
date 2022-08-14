@@ -11,13 +11,19 @@ pub struct Sphere {
 }
 
 impl Sphere {
-    pub fn hit(&self, ray: &Ray) -> bool {
+    pub fn hit(&self, ray: &Ray) -> Option<Point> {
         let a = ray.dir.dot(ray.dir);
         let diff = ray.origin - self.centre;
         let b = 2.0 * ray.dir.dot(diff);
         let c = diff.dot(diff) - self.radius * self.radius;
 
         let det = b*b - 4.0 * a * c;
-        det >= 0.0
+        if det < 0.0 {
+            None
+        } else {
+            let t = (-b - det.sqrt()) / (2.0 * a);
+            Some(ray.at(t))
+        }
+
     }
 }
