@@ -27,8 +27,9 @@ impl Viewport {
 }
 
 fn colour(ray: &Ray) -> Colour {
-    let sphere = Sphere::new(v!(0, 0, -1), 0.5);
+    let sphere = Sphere::new(v!(0, 0, 0), 0.5);
     if let Some(h) = sphere.hit(ray, (0.0, f64::INFINITY)) {
+        // if !h.front { dbg!(&h); }
         return h.n.rescale(v!(-1), v!(1), v!(0), v!(1));
     }
     v!(1).lerp(v!(0.5, 0.7, 1.0), (ray.dir.norm().y+1.0)/2.0)

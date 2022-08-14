@@ -8,6 +8,7 @@ pub struct Hit {
     pub p: Point,
     pub n: Vec3,
     pub t: f64,
+    pub front: bool,
 }
 
 pub trait Object {
@@ -37,7 +38,9 @@ impl Object for Sphere {
             else if bounds.0 <= t2 && t2 <= bounds.1 { Some(t2) } else { None };
         if let Some(t) = top {
             let p = ray.at(t);
-            Some(Hit::new(p, (p - self.centre).norm(), t))
+            let n = (p - self.centre) / self.radius;
+            let front = ray.dir.dot(n) < 0.0;
+            Some(Hit::new(p, if front { n } else { -n }, t, front))
         } else {
             None
         }
