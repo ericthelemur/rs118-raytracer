@@ -6,6 +6,7 @@ use image::{RgbImage};
 use lerp::Lerp;
 use vector::{Vec3, Colour};
 use ray::Ray;
+use rayon::prelude::*;
 
 #[derive(Debug)]
 pub struct Viewport {
@@ -39,11 +40,14 @@ fn main() {
 
     let vh = 2.0;
     let v = Viewport { w: vh * aspect_ratio, h: vh, f: 1.0 };
-    let img = RgbImage::from_fn(w, h, |x, y| {
+
+    let mut img = RgbImage::new(w, h);
+    for (x, y, p) in img.enumerate_pixels_mut() {
         let vxy = v!(x, y, 0).rescale(v!(), v!(w, h, 0), v.tl(), v.br());
         let ray = Ray::towards(v!(), vxy);
         let colour = colour(&ray);
-        colour.into()
-    });
+        *p = colour.into()
+    }
+
     img.save("test.png").expect("Eror writing image");
 }
