@@ -7,7 +7,7 @@ use lerp::Lerp;
 use vector::{Vec3, Colour};
 use ray::Ray;
 use rayon::prelude::*;
-use object::{Object, Sphere, Hit};
+use object::{Object, Sphere, Hit, Scene};
 
 #[derive(Debug)]
 pub struct Viewport {
@@ -26,10 +26,8 @@ impl Viewport {
     }
 }
 
-fn colour(ray: &Ray) -> Colour {
-    let sphere = Sphere::new(v!(0, 0, 0), 0.5);
-    if let Some(h) = sphere.hit(ray, (0.0, f64::INFINITY)) {
-        // if !h.front { dbg!(&h); }
+fn colour(ray: &Ray, scene: &Scene) -> Colour {
+    if let Some(h) = scene.hit(ray, (0.0, f64::INFINITY)) {
         return h.n.rescale(v!(-1), v!(1), v!(0), v!(1));
     }
     v!(1).lerp(v!(0.5, 0.7, 1.0), (ray.dir.norm().y+1.0)/2.0)
@@ -43,12 +41,16 @@ fn main() {
     let vh = 2.0;
     let v = Viewport { w: vh * aspect_ratio, h: vh, f: 1.0 };
 
-    let mut img = RgbImage::new(w, h);
+    let scene: Scene = vec![
+        Box::new(Sphere::new(v!(0, 0, -1.0), 0.5)),
+        Box::new(Sphere::new(v!(0.2, 0, -0.6), 0.2)),
+    ];
 
+    let mut img = RgbImage::new(w, h);
     img.enumerate_pixels_mut().par_bridge().for_each(|(x, y, p)| {
         let vxy = v!(x, y, 0).rescale(v!(), v!(w, h, 0), v.tl(), v.br());
         let ray = Ray::towards(v!(), vxy);
-        let colour = colour(&ray);
+        let colour = colour(&ray, &scene);
         *p = colour.into()
     });
 
