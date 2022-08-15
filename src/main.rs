@@ -44,6 +44,7 @@ fn main() {
     let scene: Scene = vec![
         Box::new(Sphere::new(v!(0, 0, -1.0), 0.5)),
         Box::new(Sphere::new(v!(0.2, 0, -0.6), 0.2)),
+        Box::new(Sphere::new(v!(0, -100.5, -1), 100.0)),
     ];
 
     let mut img = RgbImage::new(w, h);
