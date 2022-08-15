@@ -1,30 +1,16 @@
 mod vector;
 mod ray;
 mod object;
+mod camera;
 
+use camera::Camera;
 use image::{RgbImage};
 use lerp::Lerp;
+use rand::Rng;
 use vector::{Vec3, Colour};
 use ray::Ray;
 use rayon::prelude::*;
 use object::{Object, Sphere, Hit, Scene};
-
-#[derive(Debug)]
-pub struct Viewport {
-    pub w: f64,
-    pub h: f64,
-    pub f: f64,
-}
-
-impl Viewport {
-    fn tl(&self) -> Vec3 {
-        v!(-self.w/2.0, self.h/2.0, -self.f)
-    }
-    
-    fn br(&self) -> Vec3 {
-        v!(self.w/2.0, -self.h/2.0, -self.f)
-    }
-}
 
 fn colour(ray: &Ray, scene: &Scene) -> Colour {
     if let Some(h) = scene.hit(ray, (0.0, f64::INFINITY)) {
@@ -34,24 +20,24 @@ fn colour(ray: &Ray, scene: &Scene) -> Colour {
 }
 
 fn main() {
-    let aspect_ratio = 16.0/9.0;
-    let w = 400;
-    let h = (w as f64 / aspect_ratio) as u32;
-
-    let vh = 2.0;
-    let v = Viewport { w: vh * aspect_ratio, h: vh, f: 1.0 };
-
+    let samples = 100;
+    let c = Camera::new(400, 16. / 9.);
+    
     let scene: Scene = vec![
         Box::new(Sphere::new(v!(0, 0, -1.0), 0.5)),
         Box::new(Sphere::new(v!(0.2, 0, -0.6), 0.2)),
         Box::new(Sphere::new(v!(0, -100.5, -1), 100.0)),
     ];
 
-    let mut img = RgbImage::new(w, h);
+    let mut img = RgbImage::new(c.vw, c.vh);
     img.enumerate_pixels_mut().par_bridge().for_each(|(x, y, p)| {
-        let vxy = v!(x, y, 0).rescale(v!(), v!(w, h, 0), v.tl(), v.br());
-        let ray = Ray::towards(v!(), vxy);
-        let colour = colour(&ray, &scene);
+        let mut rng = rand::thread_rng();
+        let colour = (0..samples).map(|_| {
+            let (rx, ry): (f64, f64) = (rng.gen(), rng.gen());
+            let (sx, sy) = (x as f64 - 0.5 + rx, y as f64 - 0.5 + ry);
+            let ray = c.get_ray(sx, sy);
+            colour(&ray, &scene)
+        }).fold(v!(), |acc, x| acc + x) / (samples as f64);
         *p = colour.into()
     });
 
