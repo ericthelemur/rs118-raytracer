@@ -36,19 +36,28 @@ fn main() {
     let asp_ratio = 16. / 9.;
     let pxw = 400;
     let pxh = ((pxw as f64) / asp_ratio) as u32;
-    let c = Camera::new(90., asp_ratio, v!(), v!(0, 0, -1), v!(0, 1, 0));
+    let c = Camera::new(90., asp_ratio, v!(0, 0, 1), v!(0, 0, -1), v!(0, 1, 0));
 
     let R = (PI/4.).cos();
     let scene: Scene = vec![
         Box::new(Sphere::new(
-            v!(-R, 0, -1),
-            R,
-            Lambertian::new(v!(0, 0, 1)),
+            v!(0, 0, -1),
+            0.5,
+            Lambertian::new(v!(0.1, 0.2, 0.5)),
         )),
         Box::new(Sphere::new(
-            v!(R, 0, -1),
-            R,
-            Lambertian::new(v!(1, 0, 0)),
+            v!(-1.0, 0.0, -1.0),
+            0.5,
+            Dielectric::new(1.5))),
+        Box::new(Sphere::new(
+            v!(1.0, 0.0, -1.0),
+            0.5,
+            Metal::new(v!(0.8, 0.6, 0.2)),
+        )),
+        Box::new(Sphere::new(
+            v!(0, -100.5, -1),
+            100.0,
+            Lambertian::new(v!(0.8, 0.8, 0.0)),
         )),
     ];
     let bar = indicatif::ProgressBar::new((pxw * pxh) as u64);
@@ -71,7 +80,7 @@ fn main() {
             let colour = (0..samples).map(|_| {
                     let (rx, ry): (f64, f64) = (rng.gen(), rng.gen());
                     let (sx, sy) = (x as f64 - 0.5 + rx, y as f64 - 0.5 + ry);
-                    let (ux, uy) = (sx / pxw as f64, (pxh as f64 - sy) / pxh as f64);
+                    let (ux, uy) = (sx / pxw as f64, sy / pxh as f64);
                     let ray = c.get_ray(ux, uy);
                     colour(&ray, &scene, max_depth)
                 }).fold(v!(), |acc, x| acc + x) / (samples as f64);

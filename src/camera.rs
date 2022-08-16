@@ -21,6 +21,7 @@ pub struct Camera {
 
 impl Camera {
     pub fn new(fov: f64, aspect_ratio: f64, look_from: Point, look_at: Point, up: Vec3) -> Self {
+        dbg!(look_from, look_at);
         let angle = fov.to_radians();
         let vh = (angle / 2.).tan() * 2.;
         let vw = vh * aspect_ratio;
@@ -31,7 +32,7 @@ impl Camera {
         dbg!(u, v, w);
 
         dbg!(Self { 
-            pos: v!(),
+            pos: look_from,
             axes: Axes::new(u.norm() * vw, v.norm() * vh, w.norm()),
         })
     }
@@ -42,6 +43,6 @@ impl Camera {
 
     pub fn get_ray(&self, x: f64, y: f64) -> Ray {
         let vxy = self.tl() + x * self.axes.x - y * self.axes.y;
-        Ray::towards(v!(), vxy)
+        Ray::towards(self.pos, vxy)
     }
 }
