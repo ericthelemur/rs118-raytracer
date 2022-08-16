@@ -58,7 +58,7 @@ fn main() {
             Metal::new(v!(0.8, 0.6, 0.2)),
         )),
     ];
-    let bar = indicatif::ProgressBar::new((c.vw * c.vh * samples) as u64);
+    let bar = indicatif::ProgressBar::new((c.pxw * c.pxh) as u64);
     bar.set_style(
         indicatif::ProgressStyle::default_bar()
             .template(
@@ -69,7 +69,7 @@ fn main() {
     );
     bar.set_draw_rate(2);
 
-    let mut img = RgbImage::new(c.vw, c.vh);
+    let mut img = RgbImage::new(c.pxw, c.pxh);
     img.enumerate_pixels_mut()
         .par_bridge()
         .progress_with(bar)
