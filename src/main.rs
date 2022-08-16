@@ -28,9 +28,20 @@ fn main() {
         Box::new(Sphere::new(v!(0.2, 0, -0.6), 0.2)),
         Box::new(Sphere::new(v!(0, -100.5, -1), 100.0)),
     ];
+    let bar = indicatif::ProgressBar::new((c.vw * c.vh * samples) as u64);
+    bar.set_style(
+        indicatif::ProgressStyle::default_bar()
+            .template(
+                "{spinner:.green} [{wide_bar:.green/white}] {percent}% - {elapsed_precise} elapsed {msg}",
+            )
+            .progress_chars("#>-")
+            .on_finish(indicatif::ProgressFinish::WithMessage("-- Done!".into()))
+    );
 
     let mut img = RgbImage::new(c.vw, c.vh);
-    img.enumerate_pixels_mut().par_bridge().for_each(|(x, y, p)| {
+    img.enumerate_pixels_mut()
+        .par_bridge()
+        .for_each(|(x, y, p)| {
         let mut rng = rand::thread_rng();
         let colour = (0..samples).map(|_| {
             let (rx, ry): (f64, f64) = (rng.gen(), rng.gen());

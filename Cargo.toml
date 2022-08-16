@@ -11,3 +11,4 @@ derive_more = "0.99.17"
 lerp = { version = "0.4.0", features = ["derive"] }
 rayon = "1.5.3"
 rand = "0.8.5"
+indicatif = { version = "0.16", features = ["rayon"] }
