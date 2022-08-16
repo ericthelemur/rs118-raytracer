@@ -29,7 +29,7 @@ fn colour(ray: &Ray, scene: &Scene, depth: u32) -> Colour {
     if depth <= 0 {
         return v!(0)
     }
-    if let Some(h) = scene.hit(ray, (0.0, f64::INFINITY)) {
+    if let Some(h) = scene.hit(ray, (0.00001, f64::INFINITY)) {
         let refl = generate_reflection();
         let new_ray = Ray::new(h.p, h.n + refl);
         return 0.5 * colour(&new_ray, scene, depth - 1);
