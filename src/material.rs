@@ -48,3 +48,26 @@ impl Material for Lambertian {
         Some(Reflection::new(new_ray, self.colour))
     }
 }
+
+#[derive(Debug, Constructor)]
+pub struct Metal {
+    pub colour: Colour
+}
+
+impl Metal {
+    fn reflect_ray(v: Vec3, n: &Vec3) -> Vec3 {
+        v - 2.0 * v.dot(*n) * *n
+    }
+}
+
+impl Material for Metal {
+    fn scatter(&self, incident_ray: &Ray, hit: &Hit) -> Option<Reflection> {
+        let refl = Self::reflect_ray(incident_ray.dir, &hit.n);
+        
+        if refl.dot(hit.n) > 0.0 {
+            Some(Reflection::new(Ray::new(hit.p, refl), self.colour))
+        } else {
+            None
+        }
+    }
+}
