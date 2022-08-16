@@ -5,6 +5,7 @@ mod camera;
 
 use camera::Camera;
 use image::{RgbImage};
+use indicatif::ParallelProgressIterator;
 use lerp::Lerp;
 use rand::Rng;
 use ray::Ray;
@@ -55,11 +56,12 @@ fn main() {
             .progress_chars("#>-")
             .on_finish(indicatif::ProgressFinish::WithMessage("-- Done!".into()))
     );
+    bar.set_draw_rate(2);
 
     let mut img = RgbImage::new(c.vw, c.vh);
     img.enumerate_pixels_mut()
         .par_bridge()
-        // .progress_with(bar)
+        .progress_with(bar)
         .for_each(|(x, y, p)| {
             let mut rng = rand::thread_rng();
             let colour = (0..samples).map(|_| {
