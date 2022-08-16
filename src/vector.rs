@@ -86,6 +86,10 @@ impl Vec3 {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
     }
 
+    pub fn dist(&self, other: Self) -> f64 {
+        (other - *self).mag()
+    }
+
     pub fn cross(&self, other: Self) -> Self {
         Self {
             x: self.y * other.z - self.z * other.y,

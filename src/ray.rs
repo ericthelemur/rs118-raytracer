@@ -8,7 +8,7 @@ pub struct Ray {
 
 impl Ray {
     pub fn new(origin: Point, dir: Vec3) -> Self { 
-        Self { origin: origin, dir: dir/*.norm()*/ } 
+        Self { origin: origin, dir: dir.norm() } 
     }
 
     pub fn towards(origin: Point, target: Point) -> Self {
