@@ -12,8 +12,11 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(px_w: u32, aspect_ratio: f64) -> Self { 
-        Self { pxw: px_w, pxh: ((px_w as f64) / aspect_ratio) as u32, vw: 2.0 * aspect_ratio, vh: 2.0, f: 1.0 }
+    pub fn new(px_w: u32, fov: f64, aspect_ratio: f64) -> Self {
+        let angle = fov.to_radians();
+        let vh = (angle / 2.).tan() * 2.;
+
+        dbg!(Self { pxw: px_w, pxh: ((px_w as f64) / aspect_ratio) as u32, vw: vh * aspect_ratio, vh: vh, f: 1.0 })
     }
 
     pub fn tl(&self) -> Vec3 {

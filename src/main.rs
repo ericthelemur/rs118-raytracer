@@ -4,6 +4,8 @@ mod object;
 mod camera;
 mod material;
 
+use std::f64::consts::PI;
+
 use camera::Camera;
 use image::{RgbImage};
 use indicatif::ParallelProgressIterator;
@@ -30,32 +32,19 @@ fn colour(ray: &Ray, scene: &Scene, depth: u32) -> Colour {
 fn main() {
     let samples = 50;
     let max_depth = 20;
-    let c = Camera::new(400, 16. / 9.);
+    let c = Camera::new(400, 90., 16. / 9.);
 
+    let R = (PI/4.).cos();
     let scene: Scene = vec![
         Box::new(Sphere::new(
-            //center
-            v!(0, 0, -1),
-            0.5,
-            Lambertian::new(v!(0.7, 0.3, 0.3)),
+            v!(-R, 0, -1),
+            R,
+            Lambertian::new(v!(0, 0, 1)),
         )),
         Box::new(Sphere::new(
-            //ground
-            v!(0, -100.5, -1),
-            100.0,
-            Lambertian::new(v!(0.8, 0.8, 0.0)),
-        )),
-        Box::new(Sphere::new(
-            //left
-            v!(-1.0, 0.0, -1.0),
-            0.5,
-            Dielectric::new(1.5),
-        )),
-        Box::new(Sphere::new(
-            //right
-            v!(1.0, 0.0, -1.0),
-            0.5,
-            Metal::new(v!(0.8, 0.6, 0.2)),
+            v!(R, 0, -1),
+            R,
+            Lambertian::new(v!(1, 0, 0)),
         )),
     ];
     let bar = indicatif::ProgressBar::new((c.pxw * c.pxh) as u64);
@@ -67,7 +56,7 @@ fn main() {
             .progress_chars("#>-")
             .on_finish(indicatif::ProgressFinish::WithMessage("-- Done!".into()))
     );
-    bar.set_draw_rate(2);
+    bar.set_draw_rate(5);
 
     let mut img = RgbImage::new(c.pxw, c.pxh);
     img.enumerate_pixels_mut()
