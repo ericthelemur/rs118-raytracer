@@ -8,7 +8,7 @@ use camera::Camera;
 use image::{RgbImage};
 use indicatif::ParallelProgressIterator;
 use lerp::Lerp;
-use material::{Lambertian, Metal};
+use material::{Lambertian, Metal, Dielectric};
 use rand::Rng;
 use ray::Ray;
 use rayon::prelude::*;
@@ -49,7 +49,7 @@ fn main() {
             //left
             v!(-1.0, 0.0, -1.0),
             0.5,
-            Metal::new(v!(0.8, 0.8, 0.8)),
+            Dielectric::new(1.5),
         )),
         Box::new(Sphere::new(
             //right

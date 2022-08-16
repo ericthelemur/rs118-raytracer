@@ -71,3 +71,29 @@ impl Material for Metal {
         }
     }
 }
+
+#[derive(Debug, Constructor)]
+pub struct Dielectric {
+    ratio: f64,
+}
+
+impl Dielectric {
+    fn refract(inc: Vec3, n: Vec3, ratio: f64) -> Vec3 {
+        let co = -inc.dot(n);
+        let si = (1.0 - co*co).sqrt();
+        if ratio * si > 1.0 { 
+            return Metal::reflect_ray(inc, &n);
+        }
+        let perp = ratio * (inc + n * co);
+        let para = -(1.0 - perp.dot(perp)).abs().sqrt() * n;
+        perp + para
+    }
+}
+
+impl Material for Dielectric {
+    fn scatter(&self, incident_ray: &Ray, hit: &Hit) -> Option<Reflection> {
+        let ratio = if hit.front { 1.0 / self.ratio } else { self.ratio };
+        let refr = Dielectric::refract(incident_ray.dir, hit.n, ratio);
+        Some(Reflection::new(Ray::new(hit.p, refr), v!(1)))
+    }
+}
