@@ -20,13 +20,19 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(fov: f64, aspect_ratio: f64) -> Self {
+    pub fn new(fov: f64, aspect_ratio: f64, look_from: Point, look_at: Point, up: Vec3) -> Self {
         let angle = fov.to_radians();
         let vh = (angle / 2.).tan() * 2.;
+        let vw = vh * aspect_ratio;
+
+        let w = look_from - look_at;
+        let u = up.cross(w);
+        let v = w.cross(u);
+        dbg!(u, v, w);
 
         dbg!(Self { 
             pos: v!(),
-            axes: Axes::new(v!(vh * aspect_ratio, 0, 0), v!(0, vh, 0), v!(0, 0, 1)),
+            axes: Axes::new(u.norm() * vw, v.norm() * vh, w.norm()),
         })
     }
 
