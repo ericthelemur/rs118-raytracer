@@ -81,12 +81,17 @@ impl Dielectric {
     fn refract(inc: Vec3, n: Vec3, ratio: f64) -> Vec3 {
         let co = -inc.dot(n);
         let si = (1.0 - co*co).sqrt();
-        if ratio * si > 1.0 { 
+        if ratio * si > 1.0 || Dielectric::schlik(ratio, co) > rand::random() { 
             return Metal::reflect_ray(inc, &n);
         }
         let perp = ratio * (inc + n * co);
         let para = -(1.0 - perp.dot(perp)).abs().sqrt() * n;
         perp + para
+    }
+
+    fn schlik(ratio: f64, co: f64) -> f64 {
+        let r0 = ((1.0 - ratio) / (1.0 + ratio)).powf(2.0);
+        r0 + (1.0 - r0) * (1.0 - co).powf(5.0)
     }
 }
 
