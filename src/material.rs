@@ -9,8 +9,8 @@ use crate::vector::{Colour, Vec3};
 
 #[derive(Debug, Constructor)]
 pub struct Reflection {
-    refl: Ray,
-    colour: Colour,
+    pub ray: Ray,
+    pub colour: Colour,
 }
 
 pub trait Material {
@@ -19,7 +19,7 @@ pub trait Material {
 
 #[derive(Debug, Constructor)]
 pub struct Lambertian {
-    colour: Colour
+    pub colour: Colour
 }
 
 impl Lambertian {

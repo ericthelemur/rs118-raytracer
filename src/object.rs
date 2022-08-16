@@ -1,5 +1,6 @@
 use derive_more::Constructor;
 
+use crate::material::{Material, Reflection};
 use crate::ray::Ray;
 use crate::vector::{Point, Vec3};
 
@@ -9,6 +10,7 @@ pub struct Hit {
     pub n: Vec3,
     pub t: f64,
     pub front: bool,
+    pub refl: Option<Reflection>,
 }
 
 pub trait Object {
@@ -28,12 +30,13 @@ impl Object for Scene {
 }
 
 #[derive(Debug, Constructor, Copy, Clone)]
-pub struct Sphere {
+pub struct Sphere<M: Material> {
     pub centre: Point,
     pub radius: f64,
+    pub material: M,
 }
 
-impl Object for Sphere {
+impl <M: Material> Object for Sphere<M> {
     fn hit(&self, ray: &Ray, bounds: (f64, f64)) -> Option<Hit> {
         let a = ray.dir.dot(ray.dir);
         let diff = ray.origin - self.centre;
@@ -58,7 +61,10 @@ impl Object for Sphere {
             let p = ray.at(t);
             let n = (p - self.centre) / self.radius;
             let front = ray.dir.dot(n) < 0.0;
-            Some(Hit::new(p, if front { n } else { -n }, t, front))
+            let mut hit = Hit::new(p, if front { n } else { -n }, t, front, None);
+            let refl = self.material.scatter(ray, &hit);
+            hit.refl = refl;
+            Some(hit)
         } else {
             None
         }

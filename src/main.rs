@@ -2,37 +2,27 @@ mod vector;
 mod ray;
 mod object;
 mod camera;
+mod material;
 
 use camera::Camera;
 use image::{RgbImage};
 use indicatif::ParallelProgressIterator;
 use lerp::Lerp;
+use material::Lambertian;
 use rand::Rng;
 use ray::Ray;
 use rayon::prelude::*;
 use object::{Object, Sphere, Hit, Scene};
 use vector::{Colour, Vec3};
 
-fn generate_reflection() -> Vec3 {
-    let mut rng = rand::thread_rng();
-
-    loop {
-        let v = Vec3::new(rng.gen(), rng.gen(), rng.gen())
-            .rescale(v!(0), v!(1), v!(-1), v!(1));
-        if v.mag() <= 1.0 {
-            return v
-        }
-    }
-}
-
 fn colour(ray: &Ray, scene: &Scene, depth: u32) -> Colour {
     if depth <= 0 {
         return v!(0)
     }
     if let Some(h) = scene.hit(ray, (0.00001, f64::INFINITY)) {
-        let refl = generate_reflection();
-        let new_ray = Ray::new(h.p, h.n + refl);
-        return 0.5 * colour(&new_ray, scene, depth - 1);
+        if let Some(refl) = h.refl {
+            return refl.colour * colour(&refl.ray, scene, depth - 1);
+        }
     }
     v!(1).lerp(v!(0.5, 0.7, 1.0), (ray.dir.norm().y + 1.0) / 2.0)
 }
@@ -43,9 +33,9 @@ fn main() {
     let c = Camera::new(400, 16. / 9.);
 
     let scene: Scene = vec![
-        Box::new(Sphere::new(v!(0, 0, -1.0), 0.5)),
-        Box::new(Sphere::new(v!(0.2, 0, -0.6), 0.2)),
-        Box::new(Sphere::new(v!(0, -100.5, -1), 100.0)),
+        Box::new(Sphere::new(v!(0, 0, -1.0), 0.5, Lambertian::new(v!(0.5)))),
+        Box::new(Sphere::new(v!(0.2, 0, -0.6), 0.2, Lambertian::new(v!(0.5)))),
+        Box::new(Sphere::new(v!(0, -100.5, -1), 100.0, Lambertian::new(v!(0.5)))),
     ];
     let bar = indicatif::ProgressBar::new((c.vw * c.vh * samples) as u64);
     bar.set_style(
