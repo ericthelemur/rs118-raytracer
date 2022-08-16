@@ -39,7 +39,11 @@ impl Lambertian {
 impl Material for Lambertian {
     fn scatter(&self, incident_ray: &Ray, hit: &Hit) -> Option<Reflection> {
         let refl = Self::generate_reflection();
-        let new_ray = Ray::new(hit.p, hit.n + refl);
+        let new_ray = if refl.is_tiny() {
+            Ray::new(hit.p, hit.n)
+        } else {
+            Ray::new(hit.p, hit.n + refl)
+        };
 
         Some(Reflection::new(new_ray, self.colour))
     }

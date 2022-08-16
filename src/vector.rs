@@ -119,6 +119,11 @@ impl Vec3 {
         let v = self.invlerp(oldmin, oldmax);
         newmin.lerp(newmax, v)
     }
+
+    pub fn is_tiny(&self) -> bool {
+        let eps = 0.00000001;
+        self.x.abs() < eps && self.y.abs() < eps && self.z.abs() < eps 
+    }
 }
 
 impl Lerp<Vec3> for Vec3 {
