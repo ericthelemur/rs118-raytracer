@@ -31,7 +31,7 @@ macro_rules! v {
 
 // Converts [0.0, 1.0] to [0, 255]
 pub fn f2b(v: f64) -> u8 {
-    (v * 256.0) as u8
+    (v.sqrt() * 256.0) as u8
 }
 
 // Converts Vec3 to image::Rgb
