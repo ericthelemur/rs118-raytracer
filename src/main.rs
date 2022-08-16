@@ -36,7 +36,7 @@ fn main() {
     let asp_ratio = 16. / 9.;
     let pxw = 400;
     let pxh = ((pxw as f64) / asp_ratio) as u32;
-    let c = Camera::new(90., asp_ratio, v!(0, 0, 1), v!(0, 0, -1), v!(0, 1, 0));
+    let c = Camera::new(20., asp_ratio, v!(-2, 2, 1), v!(0, 0, -1), v!(0, 1, 0));
 
     let R = (PI/4.).cos();
     let scene: Scene = vec![
