@@ -31,12 +31,14 @@ fn colour(ray: &Ray, scene: &Scene, depth: u32) -> Colour {
 }
 
 fn main() {
-    let samples = 50;
+    let samples = 100;
     let max_depth = 20;
     let asp_ratio = 16. / 9.;
     let pxw = 400;
     let pxh = ((pxw as f64) / asp_ratio) as u32;
-    let c = Camera::new(20., asp_ratio, v!(-2, 2, 1), v!(0, 0, -1), v!(0, 1, 0));
+    let from = v!(-2, 2, 1);
+    let to = v!(0, 0, -1);
+    let c = Camera::new(20., asp_ratio, from, to, v!(0, 1, 0), 2.0, from.dist(to));
 
     let R = (PI/4.).cos();
     let scene: Scene = vec![
