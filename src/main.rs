@@ -30,38 +30,74 @@ fn colour(ray: &Ray, scene: &Scene, depth: u32) -> Colour {
     v!(1).lerp(v!(0.5, 0.7, 1.0), (ray.dir.norm().y + 1.0) / 2.0)
 }
 
+fn random_scene() -> Scene {
+    let mut objects: Scene = vec![];
+
+    let ground = Box::new(Sphere::new(
+        v!(0, -1000, 0),
+        1000.0,
+        Lambertian::new(v!(0.5, 0.5, 0.5)),
+    ));
+    objects.push(ground);
+
+    for a in -11..11 {
+        for b in -11..11 {
+            let a = a as f64;
+            let b = b as f64;
+            let material_choice: f64 = rand::random();
+            let center = v!(
+                a + 0.9 * rand::random::<f64>(),
+                0.2,
+                b + 0.9 * rand::random::<f64>()
+            );
+
+            if material_choice < 0.8 {
+                //diffuse
+                let material = Lambertian::new(v!(rand::random::<f64>()));
+                objects.push(Box::new(Sphere::new(center, 0.2, material)));
+            } else if material_choice < 0.95 {
+                //metal
+                let colour = v!(rand::random::<f64>() / 2.0 + 0.5);
+                let fuzz = rand::random::<f64>() / 2.0;
+                let material = Metal::new(colour);
+                objects.push(Box::new(Sphere::new(center, 0.2, material)));
+            } else {
+                //glass
+                objects.push(Box::new(Sphere::new(center, 0.2, Dielectric::new(1.5))));
+            }
+        }
+    }
+
+    objects.push(Box::new(Sphere::new(
+        v!(0, 1, 0),
+        1.0,
+        Dielectric::new(1.5),
+    )));
+    objects.push(Box::new(Sphere::new(
+        v!(-4, 1, 0),
+        1.0,
+        Lambertian::new(v!(0.4, 0.2, 0.1)),
+    )));
+    objects.push(Box::new(Sphere::new(
+        v!(4, 1, 0),
+        1.0,
+        Metal::new(v!(0.7, 0.6, 0.5)),
+    )));
+    objects
+}
+
 fn main() {
     let samples = 100;
     let max_depth = 20;
-    let asp_ratio = 16. / 9.;
+    let asp_ratio = 1.5;
     let pxw = 400;
     let pxh = ((pxw as f64) / asp_ratio) as u32;
-    let from = v!(-2, 2, 1);
-    let to = v!(0, 0, -1);
-    let c = Camera::new(20., asp_ratio, from, to, v!(0, 1, 0), 2.0, from.dist(to));
+    let from = v!(13, 2, 3);
+    let to = v!(0, 0, 0);
+    let c = Camera::new(20., asp_ratio, from, to, v!(0, 1, 0), 0.1, 10.);
 
     let R = (PI/4.).cos();
-    let scene: Scene = vec![
-        Box::new(Sphere::new(
-            v!(0, 0, -1),
-            0.5,
-            Lambertian::new(v!(0.1, 0.2, 0.5)),
-        )),
-        Box::new(Sphere::new(
-            v!(-1.0, 0.0, -1.0),
-            0.5,
-            Dielectric::new(1.5))),
-        Box::new(Sphere::new(
-            v!(1.0, 0.0, -1.0),
-            0.5,
-            Metal::new(v!(0.8, 0.6, 0.2)),
-        )),
-        Box::new(Sphere::new(
-            v!(0, -100.5, -1),
-            100.0,
-            Lambertian::new(v!(0.8, 0.8, 0.0)),
-        )),
-    ];
+    let scene: Scene = random_scene();
     let bar = indicatif::ProgressBar::new((pxw * pxh) as u64);
     bar.set_style(
         indicatif::ProgressStyle::default_bar()

@@ -86,7 +86,7 @@ impl Dielectric {
         }
         let perp = ratio * (inc + n * co);
         let para = -(1.0 - perp.dot(perp)).abs().sqrt() * n;
-        perp + para
+        perp + para 
     }
 
     fn schlik(ratio: f64, co: f64) -> f64 {
